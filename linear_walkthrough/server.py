@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import subprocess
 import threading
 import webbrowser
@@ -108,6 +109,67 @@ class WalkthroughServer(HTTPServer):
     css: str
     cwd: Path
     conversation_started: bool
+    pr_context: str
+
+
+def _detect_pr_ref(source: str) -> str | None:
+    """Extract a PR reference from markdown content.
+
+    Looks for GitHub PR URLs like https://github.com/owner/repo/pull/123
+    and returns 'owner/repo#123' for use with gh CLI.
+    """
+    match = re.search(
+        r"https?://github\.com/([^/]+/[^/]+)/pull/(\d+)", source
+    )
+    if match:
+        return f"{match.group(1)}#{match.group(2)}"
+    return None
+
+
+def _fetch_pr_context(pr_ref: str, cwd: Path) -> str:
+    """Fetch PR info and diff using gh CLI. Returns context string or empty."""
+    # Parse owner/repo#number or just #number
+    match = re.match(r"(?:([^#]+)#)?(\d+)$", pr_ref)
+    if not match:
+        return ""
+
+    repo_part = match.group(1)  # owner/repo or None
+    pr_number = match.group(2)
+
+    base_cmd = ["gh", "pr"]
+    repo_args = ["-R", repo_part] if repo_part else []
+
+    parts = []
+    try:
+        # Fetch PR metadata
+        view_result = subprocess.run(
+            [*base_cmd, "view", pr_number, *repo_args],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        if view_result.returncode == 0:
+            parts.append(f"## PR Info\n\n{view_result.stdout}")
+
+        # Fetch PR diff
+        diff_result = subprocess.run(
+            [*base_cmd, "diff", pr_number, *repo_args],
+            cwd=cwd,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        if diff_result.returncode == 0:
+            diff = diff_result.stdout
+            # Truncate very large diffs
+            if len(diff) > 50000:
+                diff = diff[:50000] + "\n... (diff truncated)"
+            parts.append(f"## PR Diff\n\n```diff\n{diff}\n```")
+    except Exception:
+        pass
+
+    return "\n\n".join(parts)
 
 
 def start_server(
@@ -117,22 +179,45 @@ def start_server(
     cwd: Path,
     input_path: Path,
     css: str,
+    pr: str | None = None,
 ):
-    server = WalkthroughServer(("127.0.0.1", port), WalkthroughHandler)
+    try:
+        server = WalkthroughServer(("127.0.0.1", port), WalkthroughHandler)
+    except OSError as e:
+        if e.errno == 98 or e.errno == 48:  # EADDRINUSE: Linux=98, macOS=48
+            print(f"Error: port {port} is already in use. Try a different port with -p.")
+            raise SystemExit(1) from None
+        raise
     server.input_path = input_path
     server.title = title
     server.css = css
     server.cwd = cwd
     server.conversation_started = False
+    server.pr_context = ""
+
+    # Resolve PR context
+    pr_ref = pr or _detect_pr_ref(source)
+    if pr_ref:
+        print(f"Fetching PR context for {pr_ref}...")
+        server.pr_context = _fetch_pr_context(pr_ref, cwd)
+        if server.pr_context:
+            print("PR context loaded.")
+        else:
+            print("Could not fetch PR context (is `gh` installed and authenticated?).")
 
     # Seed claude with the original walkthrough context
     def seed_context():
         try:
+            seed_prompt = "You are helping explain a code walkthrough. Respond in GitHub-flavored markdown syntax. Prefer using Mermaid.js diagrams (```mermaid fenced blocks) when visualizations would help. Here is the full walkthrough for context. Do not respond with anything other than 'OK'."
+            seed_prompt += f"\n\n{source}"
+            if server.pr_context:
+                seed_prompt += f"\n\nHere is the pull request information and diff for additional context:\n\n{server.pr_context}"
+
             subprocess.run(
                 [
                     "claude",
                     "-p",
-                    f"You are helping explain a code walkthrough. Respond in GitHub-flavored markdown syntax. Prefer using Mermaid.js diagrams (```mermaid fenced blocks) when visualizations would help. Here is the full walkthrough for context. Do not respond with anything other than 'OK'.\n\n{source}",
+                    seed_prompt,
                     "--output-format",
                     "text",
                 ],
@@ -140,7 +225,7 @@ def start_server(
                 env=_clean_env(),
                 capture_output=True,
                 text=True,
-                timeout=60,
+                timeout=300,
             )
             server.conversation_started = True
         except Exception:

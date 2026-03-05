@@ -42,6 +42,10 @@ def main():
         "--cwd",
         help="Working directory for claude subprocess (default: input file directory)",
     )
+    parser.add_argument(
+        "--pr",
+        help="PR reference to fetch context for (e.g. owner/repo#123 or just #123). Auto-detected from markdown content if omitted.",
+    )
     args = parser.parse_args()
 
     if args.input:
@@ -74,6 +78,7 @@ def main():
             cwd=cwd,
             input_path=input_path,
             css=build_css(),
+            pr=args.pr,
         )
     else:
         html = render_page(source, title=args.title, fallback_title=fallback_title)

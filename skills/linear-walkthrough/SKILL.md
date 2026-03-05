@@ -125,7 +125,7 @@ gh pr view NUMBER --json baseRefOid,headRefOid
 Then follow the same walkthrough structure, focusing on what the PR changes and why.
 
 **PR-specific additions:**
-- Start with a link to the PR: `[PR #123: Title](https://github.com/OWNER/REPO/pull/123)`
+- Start with a full GitHub PR URL link: `[PR #123: Title](https://github.com/OWNER/REPO/pull/123)` — this format (`https://github.com/OWNER/REPO/pull/NUMBER`) is required so the interactive server can auto-detect and fetch the PR diff for follow-up context.
 - Follow with a summary of the PR's purpose
 - Walk through changes in logical order (not file order)
 - Highlight the key design decisions
@@ -146,5 +146,13 @@ After writing the walkthrough file, tell the user:
 > ```bash
 > uvx linear-walkthrough [filename] -o walkthrough.html
 > ```
+
+**For PR walkthroughs**, suggest `--serve` with `--pr` so the interactive server seeds Claude with the full PR diff and metadata for better follow-up answers:
+
+> ```bash
+> uvx linear-walkthrough [filename] --serve --pr owner/repo#123
+> ```
+>
+> The `--pr` flag fetches PR info and diff via `gh` CLI and includes it in the Claude seed context. If omitted, the server auto-detects GitHub PR URLs from the markdown content.
 
 Do NOT run `uvx linear-walkthrough --serve` automatically -- let the user choose.
