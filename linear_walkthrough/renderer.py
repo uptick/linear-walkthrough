@@ -87,9 +87,4 @@ def build_css() -> str:
     light_css = light_fmt.get_style_defs("code.highlight")
     dark_css = dark_fmt.get_style_defs("code.highlight")
 
-    return (
-        light_css
-        + "\n@media (prefers-color-scheme: dark) {\n"
-        + dark_css
-        + "\n}\n"
-    )
+    return light_css + "\n@media (prefers-color-scheme: dark) {\n" + dark_css + "\n}\n"

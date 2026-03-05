@@ -8,6 +8,8 @@ import webbrowser
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 
+from linear_walkthrough.renderer import render_markdown
+
 
 def _clean_env() -> dict[str, str]:
     """Clone the environment with CLAUDE_CODE vars removed so claude subprocess works from within Claude Code."""
@@ -17,11 +19,8 @@ def _clean_env() -> dict[str, str]:
             env.pop(key)
     return env
 
-from linear_walkthrough.renderer import render_markdown
-
 
 class WalkthroughHandler(BaseHTTPRequestHandler):
-
     def do_GET(self):
         if self.path == "/":
             self._respond(200, "text/html", self._build_page())
@@ -85,7 +84,9 @@ class WalkthroughHandler(BaseHTTPRequestHandler):
         )
 
         if result.returncode != 0:
-            raise RuntimeError(f"claude exited with code {result.returncode}: {result.stderr}")
+            raise RuntimeError(
+                f"claude exited with code {result.returncode}: {result.stderr}"
+            )
 
         self.server.conversation_started = True
         return result.stdout
@@ -128,7 +129,13 @@ def start_server(
     def seed_context():
         try:
             subprocess.run(
-                ["claude", "-p", f"You are helping explain a code walkthrough. Respond in GitHub-flavored markdown syntax. Prefer using Mermaid.js diagrams (```mermaid fenced blocks) when visualizations would help. Here is the full walkthrough for context. Do not respond with anything other than 'OK'.\n\n{source}", "--output-format", "text"],
+                [
+                    "claude",
+                    "-p",
+                    f"You are helping explain a code walkthrough. Respond in GitHub-flavored markdown syntax. Prefer using Mermaid.js diagrams (```mermaid fenced blocks) when visualizations would help. Here is the full walkthrough for context. Do not respond with anything other than 'OK'.\n\n{source}",
+                    "--output-format",
+                    "text",
+                ],
                 cwd=cwd,
                 env=_clean_env(),
                 capture_output=True,

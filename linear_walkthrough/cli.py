@@ -17,19 +17,25 @@ def main():
         help="Path to markdown file (reads stdin if omitted)",
     )
     parser.add_argument(
-        "-o", "--output",
+        "-o",
+        "--output",
         help="Output file path (writes to stdout if omitted)",
     )
     parser.add_argument(
-        "-t", "--title",
+        "-t",
+        "--title",
         help="Page title (auto-detected from first heading if omitted)",
     )
     parser.add_argument(
-        "--serve", action="store_true",
+        "--serve",
+        action="store_true",
         help="Start interactive server mode",
     )
     parser.add_argument(
-        "-p", "--port", type=int, default=7847,
+        "-p",
+        "--port",
+        type=int,
+        default=7847,
         help="Server port (default: 7847)",
     )
     parser.add_argument(
@@ -44,7 +50,9 @@ def main():
         fallback_title = input_path.stem
     else:
         if sys.stdin.isatty():
-            parser.error("No input file and no stdin data. Provide a file or pipe markdown in.")
+            parser.error(
+                "No input file and no stdin data. Provide a file or pipe markdown in."
+            )
         source = sys.stdin.read()
         fallback_title = None
         input_path = None
