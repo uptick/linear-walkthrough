@@ -118,7 +118,13 @@ def start_server(
     input_path: Path,
     css: str,
 ):
-    server = WalkthroughServer(("127.0.0.1", port), WalkthroughHandler)
+    try:
+        server = WalkthroughServer(("127.0.0.1", port), WalkthroughHandler)
+    except OSError as e:
+        if e.errno == 98 or e.errno == 48:  # EADDRINUSE: Linux=98, macOS=48
+            print(f"Error: port {port} is already in use. Try a different port with -p.")
+            raise SystemExit(1) from None
+        raise
     server.input_path = input_path
     server.title = title
     server.css = css
