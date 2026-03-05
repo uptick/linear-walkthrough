@@ -7,7 +7,7 @@ import webbrowser
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 
-from renderer import render_markdown
+from linear_walkthrough.renderer import render_markdown
 
 
 class WalkthroughHandler(BaseHTTPRequestHandler):
@@ -50,7 +50,7 @@ class WalkthroughHandler(BaseHTTPRequestHandler):
         self._respond(200, "application/json", response)
 
     def _build_page(self) -> str:
-        from template import render_interactive_template
+        from linear_walkthrough.template import render_interactive_template
 
         source = self.server.input_path.read_text()
         content = render_markdown(source)

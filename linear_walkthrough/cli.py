@@ -4,7 +4,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from renderer import render_page, extract_title
+from linear_walkthrough.renderer import render_page, extract_title
 
 
 def main():
@@ -53,8 +53,8 @@ def main():
         if input_path is None:
             parser.error("--serve requires a file argument (cannot use stdin)")
 
-        from renderer import build_css
-        from server import start_server
+        from linear_walkthrough.renderer import build_css
+        from linear_walkthrough.server import start_server
 
         title = args.title or extract_title(source) or fallback_title or "Walkthrough"
         cwd = Path(args.cwd) if args.cwd else input_path.parent

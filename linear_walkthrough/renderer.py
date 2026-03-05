@@ -8,7 +8,7 @@ from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import get_lexer_by_name, guess_lexer, TextLexer
 
-from template import GITHUB_CSS, render_template
+from linear_walkthrough.template import GITHUB_CSS, render_template
 
 
 def _highlight_code(code: str, lang: str) -> str:
