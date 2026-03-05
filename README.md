@@ -4,6 +4,8 @@ Generate self-contained, GitHub-styled HTML walkthroughs from GFM markdown.
 
 Takes markdown files with code walkthroughs and produces single-file HTML pages with syntax highlighting, dark mode support, and Mermaid diagram rendering. Optionally launches an interactive server where you can select text and ask Claude follow-up questions.
 
+![Screenshot of linear-walkthrough interactive mode](screenshot.png)
+
 ## Install
 
 ```bash
@@ -59,7 +61,7 @@ linear_walkthrough/
 
 ## Tech Stack
 
-- **Python 3.13+** managed with **uv**
+- **Python 3.12+** managed with **uv**
 - **markdown-it-py** — GFM parsing
 - **Pygments** — syntax highlighting
 - **minijinja** — HTML templating
