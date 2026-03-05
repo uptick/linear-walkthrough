@@ -5,22 +5,24 @@ Generate self-contained, GitHub-styled HTML walkthroughs from GFM markdown.
 ## Quick Start
 
 ```bash
-uv run python main.py input.md -o output.html   # file input
-cat input.md | uv run python main.py -o out.html # stdin pipe
-uv run python main.py input.md                   # stdout
-uv run python main.py input.md --serve           # interactive server mode
+uv run linear-walkthrough input.md -o output.html   # file input
+cat input.md | uv run linear-walkthrough -o out.html # stdin pipe
+uv run linear-walkthrough input.md                   # stdout
+uv run linear-walkthrough input.md --serve           # interactive server mode
+uvx linear-walkthrough input.md -o output.html       # run from github
 ```
 
 ## Project Structure
 
 ```
-main.py          - CLI entry point (argparse, stdin/file input, stdout/-o output)
-renderer.py      - Core rendering: markdown -> HTML via markdown-it-py + Pygments
-template.py      - Minijinja template loader, CSS constants, render_template()
-server.py        - Interactive server mode (stdlib http.server, claude subprocess)
-templates/
-  page.html              - Jinja2 HTML template for static output
-  page_interactive.html  - Interactive template with text selection + follow-up JS
+linear_walkthrough/
+  cli.py           - CLI entry point (argparse, stdin/file input, stdout/-o output)
+  renderer.py      - Core rendering: markdown -> HTML via markdown-it-py + Pygments
+  template.py      - Minijinja template loader, CSS constants, render_template()
+  server.py        - Interactive server mode (stdlib http.server, claude subprocess)
+  templates/
+    page.html              - Jinja2 HTML template for static output
+    page_interactive.html  - Interactive template with text selection + follow-up JS
 docs/plans/      - Design documents
 ```
 

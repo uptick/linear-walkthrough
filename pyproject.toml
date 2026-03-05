@@ -1,9 +1,17 @@
 [project]
 name = "linear-walkthrough"
-version = "0.1.0"
+version = "0.2.0"
 description = "Generate GitHub-styled HTML walkthroughs from markdown"
 readme = "README.md"
-requires-python = ">=3.13"
+license = "MIT"
+requires-python = ">=3.12"
+authors = [
+    { name = "Uptick", email = "dev@uptickhq.com" },
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+]
 dependencies = [
     "markdown-it-py[plugins]",
     "minijinja>=2.17.1",
@@ -11,7 +19,11 @@ dependencies = [
 ]
 
 [project.scripts]
-linear-walkthrough = "main:main"
+linear-walkthrough = "linear_walkthrough.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [dependency-groups]
 dev = [

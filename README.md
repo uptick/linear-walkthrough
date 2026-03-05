@@ -4,17 +4,48 @@ Generate self-contained, GitHub-styled HTML walkthroughs from GFM markdown.
 
 Takes markdown files with code walkthroughs and produces single-file HTML pages with syntax highlighting, dark mode support, and Mermaid diagram rendering. Optionally launches an interactive server where you can select text and ask Claude follow-up questions.
 
+![Screenshot of linear-walkthrough interactive mode](screenshot.png)
+
+## Install
+
+```bash
+# Run directly from GitHub
+uvx --from git+https://github.com/uptick/linear-walkthrough linear-walkthrough input.md -o output.html
+
+# Or install locally
+uv pip install git+https://github.com/uptick/linear-walkthrough
+linear-walkthrough input.md -o output.html
+```
+
+## AI Coding Assistants
+
+Add the skill to your AI coding assistant:
+
+```bash
+npx skills add uptick/linear-walkthrough
+```
+
+Works with Claude Code, Codex, Cursor, Gemini CLI, GitHub Copilot, Goose, OpenCode, and Windsurf.
+
+Example prompts:
+
+```
+/linear-walkthrough Walk me through the auth module
+/linear-walkthrough Create a walkthrough for PR #42
+/linear-walkthrough Give me a beginner-friendly walkthrough of the API layer
+```
+
 ## Quick Start
 
 ```bash
 # File input → file output
-uv run python main.py input.md -o output.html
+uv run linear-walkthrough input.md -o output.html
 
 # Stdin → stdout
-cat input.md | uv run python main.py -o out.html
+cat input.md | uv run linear-walkthrough -o out.html
 
 # Interactive server mode (opens browser)
-uv run python main.py input.md --serve
+uv run linear-walkthrough input.md --serve
 ```
 
 ## Features
@@ -28,7 +59,7 @@ uv run python main.py input.md --serve
 ## Interactive Server Mode
 
 ```bash
-uv run python main.py walkthrough.md --serve [-p PORT] [--cwd DIR]
+uv run linear-walkthrough walkthrough.md --serve [-p PORT] [--cwd DIR]
 ```
 
 Starts a local HTTP server (default port 7847) that renders your walkthrough with a text selection UI. Select any text and ask a question — Claude responds using the full walkthrough as context. Follow-up responses are appended to the original markdown file.
@@ -36,18 +67,19 @@ Starts a local HTTP server (default port 7847) that renders your walkthrough wit
 ## Project Structure
 
 ```
-main.py          - CLI entry point
-renderer.py      - Markdown → HTML via markdown-it-py + Pygments
-template.py      - Minijinja template loader + CSS
-server.py        - Interactive server mode (stdlib http.server + claude subprocess)
-templates/
-  page.html              - Static output template
-  page_interactive.html  - Interactive template with follow-up JS
+linear_walkthrough/
+  cli.py           - CLI entry point
+  renderer.py      - Markdown → HTML via markdown-it-py + Pygments
+  template.py      - Minijinja template loader + CSS
+  server.py        - Interactive server mode (stdlib http.server + claude subprocess)
+  templates/
+    page.html              - Static output template
+    page_interactive.html  - Interactive template with follow-up JS
 ```
 
 ## Tech Stack
 
-- **Python 3.13+** managed with **uv**
+- **Python 3.12+** managed with **uv**
 - **markdown-it-py** — GFM parsing
 - **Pygments** — syntax highlighting
 - **minijinja** — HTML templating
