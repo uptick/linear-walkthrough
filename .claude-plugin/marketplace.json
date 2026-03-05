@@ -1,0 +1,19 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "linear-walkthrough",
+  "description": "Linear walkthrough of code for humans",
+  "owner": {
+    "name": "Uptick",
+    "email": "dev@uptickhq.com"
+  },
+  "plugins": [
+    {
+      "name": "linear-walkthrough",
+      "description": "Creates a markdown linear walkthrough of a codebase and visualises it interactively",
+      "source": "./",
+      "strict": false,
+      "skills": ["./skills/linear-walkthrough"],
+      "category": "development"
+    }
+  ]
+}

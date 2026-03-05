@@ -17,6 +17,24 @@ uv pip install git+https://github.com/uptick/linear-walkthrough
 linear-walkthrough input.md -o output.html
 ```
 
+## AI Coding Assistants
+
+Add the skill to your AI coding assistant:
+
+```bash
+npx skills add uptick/linear-walkthrough
+```
+
+Works with Claude Code, Codex, Cursor, Gemini CLI, GitHub Copilot, Goose, OpenCode, and Windsurf.
+
+Example prompts:
+
+```
+/linear-walkthrough Walk me through the auth module
+/linear-walkthrough Create a walkthrough for PR #42
+/linear-walkthrough Give me a beginner-friendly walkthrough of the API layer
+```
+
 ## Quick Start
 
 ```bash
